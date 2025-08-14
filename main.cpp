@@ -1,6 +1,11 @@
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cmath>
+#include <cassert>
 #include <cmath>
 #include <cstdlib>
 #include <cctype>
@@ -154,6 +159,29 @@ void drawSquare(int n, char ch = '#', bool filled = true) {
     }
 }
 
+void renderAsciiArt(const std::vector<std::string>& pattern,
+                    int scaleX = 1, int scaleY = 1,
+                    char on = '#', char off = ' ')
+{
+    if (pattern.empty() || scaleX < 1 || scaleY < 1) return;
+
+    const size_t rows = pattern.size();
+    size_t cols = 0;
+    for (const auto& row : pattern) cols = std::max(cols, row.size());
+
+    for (size_t r = 0; r < rows; ++r) {
+        for (int sy = 0; sy < scaleY; ++sy) {
+            for (size_t c = 0; c < cols; ++c) {
+                const bool bit = (c < pattern[r].size() && pattern[r][c] != ' ');
+                const char ch = bit ? on : off;
+                for (int sx = 0; sx < scaleX; ++sx)
+                    std::cout << ch;
+            }
+            std::cout << '\n';
+        }
+    }
+}
+
 void drawCircle(int radius, char ch = 'o', bool filled = false) {
     if (radius <= 0) return;
 
@@ -217,6 +245,37 @@ int main() {
     std::cout << "\nFilled circle (r=6):\n";
     drawCircle(6, '#', true);
 
+
+    std::vector<std::string> heart = {
+        "  **   **  ",
+        " **** **** ",
+        "***********",
+        " ********* ",
+        "  *******  ",
+        "   *****   ",
+        "    ***    ",
+        "     *     "
+    };
+
+    std::cout << "Heart x1:\n";
+    renderAsciiArt(heart, 1, 1, '@', ' ');
+
+    std::cout << "\nHeart x2 (scaled):\n";
+    renderAsciiArt(heart, 2, 2, '*', ' ');
+
+
+    std::vector<std::string> smiley = {
+        "  *****  ",
+        " *     * ",
+        "*  * *  *",
+        "*       *",
+        "*  ---  *",
+        " *     * ",
+        "  *****  "
+    };
+
+    std::cout << "\nSmiley x1:\n";
+    renderAsciiArt(smiley, 1, 1, '#', ' ');
 
     return 0;
 }
